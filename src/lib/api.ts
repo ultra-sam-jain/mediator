@@ -61,3 +61,31 @@ export function webhookUrl(source: string): string {
     (typeof window !== 'undefined' ? window.location.origin : '')
   return `${base}/api/webhook?source=${encodeURIComponent(source)}`
 }
+
+export interface HousingStatusResponse {
+  configured: boolean
+  profileId: string | null
+  hasEncryptionKey: boolean
+  pullApiUrl: string | null
+}
+
+export async function fetchHousingStatus(): Promise<HousingStatusResponse> {
+  const res = await apiFetch('/api/housing/status')
+  if (res.status === 401) throw new Error('Unauthorized')
+  if (!res.ok) throw new Error('Failed to load Housing status')
+  return res.json() as Promise<HousingStatusResponse>
+}
+
+export interface HousingSyncResponse {
+  ok: boolean
+  imported: number
+  failed: number
+  message: string
+  details?: string
+}
+
+export async function syncHousingLeads(): Promise<HousingSyncResponse> {
+  const res = await apiFetch('/api/housing/sync', { method: 'POST' })
+  if (res.status === 401) throw new Error('Unauthorized')
+  return res.json() as Promise<HousingSyncResponse>
+}

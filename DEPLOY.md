@@ -39,6 +39,8 @@ In Vercel → Project → **Settings** → **Environment Variables**, add:
 | `ADMIN_PASSWORD` | Strong password for dashboard login (min 8 chars) |
 | `ADMIN_SESSION_SECRET` | Random string for signing cookies (recommended) |
 | `HOUSING_GAS_URL` | Your Housing Google Apps Script URL |
+| `HOUSING_PROFILE_ID` | Housing seller dashboard → Profile ID |
+| `HOUSING_ENCRYPTION_KEY` | Housing seller dashboard → Encryption Key (server only) |
 | `SUPABASE_URL` | `https://xxxxx.supabase.co` |
 | `SUPABASE_SERVICE_ROLE_KEY` | service_role key from Supabase |
 | `VITE_PUBLIC_APP_URL` | `https://YOUR_PROJECT.vercel.app` (set after first deploy) |

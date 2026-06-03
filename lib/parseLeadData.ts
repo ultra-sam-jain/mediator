@@ -12,20 +12,44 @@ function pickString(body: Record<string, unknown>, keys: string[]): string {
 
 export function parseLeadData(body: Record<string, unknown>): ParsedLead {
   return {
-    name: pickString(body, ['Name', 'name', 'customer_name', 'Customer_Name']),
+    name: pickString(body, [
+      'Name',
+      'name',
+      'lead_name',
+      'customer_name',
+      'Customer_Name',
+      'buyer_name',
+      'Buyer_Name',
+    ]),
     phone: pickString(body, [
       'Mobile_Number',
       'mobile',
       'phone',
       'Phone',
+      'lead_phone',
       'contact_number',
       'Contact_Number',
+      'phone_number',
+      'Phone_Number',
+      'mobile_number',
     ]),
-    project: pickString(body, ['Project_Name', 'project', 'project_name', 'Project']),
-    budget: pickString(body, ['Budget', 'budget', 'price_range']),
-    email: pickString(body, ['Email_Id', 'email', 'Email']),
-    propertyType: pickString(body, ['Property_Type', 'property_type', 'propertyType']),
-    intent: pickString(body, ['Intent', 'intent', 'lead_intent']),
+    project: pickString(body, [
+      'Project_Name',
+      'project',
+      'project_name',
+      'Project',
+      'property_name',
+      'listing_name',
+    ]),
+    budget: pickString(body, ['Budget', 'budget', 'price_range', 'max_price', 'min_price']),
+    email: pickString(body, ['Email_Id', 'email', 'Email', 'email_id', 'lead_email']),
+    propertyType: pickString(body, [
+      'Property_Type',
+      'property_type',
+      'propertyType',
+      'property_category',
+    ]),
+    intent: pickString(body, ['Intent', 'intent', 'lead_intent', 'requirement_type']),
   }
 }
 

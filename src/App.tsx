@@ -22,6 +22,7 @@ export default function App() {
                 title="Housing Leads"
                 initialFilters={{ source: 'housing' }}
                 showSourceFilter={false}
+                showHousingPanel
               />
             }
           />

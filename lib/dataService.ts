@@ -41,7 +41,20 @@ export async function forwardLead(
     return { ok: false, error: `No destination URL configured for source "${sourceKey}"` }
   }
 
-  const result = await forwardToDestination(source.destinationUrl, rawPayload)
+  // Parse fields using our central parser to guarantee compatibility with mapped Google Apps Script keys
+  const parsed = parseLeadData(rawPayload)
+  const mappedPayload = {
+    ...rawPayload,
+    Name: parsed.name,
+    Mobile_Number: parsed.phone,
+    Project_Name: parsed.project,
+    Budget: parsed.budget,
+    Email_Id: parsed.email,
+    Property_Type: parsed.propertyType,
+    Intent: parsed.intent,
+  }
+
+  const result = await forwardToDestination(source.destinationUrl, mappedPayload)
   return result.ok ? { ok: true } : { ok: false, error: result.error ?? result.body }
 }
 

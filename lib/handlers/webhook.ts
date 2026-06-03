@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { processIncomingLead } from '../dataService.js'
 import { readRequestBody } from '../parseLeadData.js'
+import { parseHousingBody } from '../housing/housingInbound.js'
 import { getSource } from '../sources.js'
 import { getQueryParam, readRawBody, sendJson, setCors } from '../apiUtils.js'
 
@@ -36,7 +37,21 @@ export async function handleWebhook(req: Req, res: Res, requestUrl?: string) {
     typeof req.headers['content-type'] === 'string'
       ? req.headers['content-type']
       : undefined
-  const body = await readRequestBody(rawBody, contentType)
+
+  let body: Record<string, unknown>
+  let housingMeta: { decrypted?: boolean; warning?: string } = {}
+
+  if (sourceKey === 'housing') {
+    const parsed = await parseHousingBody(rawBody, contentType, req.headers)
+    if (parsed.warning?.includes('Profile ID mismatch')) {
+      sendJson(res, 403, { error: parsed.warning })
+      return
+    }
+    body = parsed.body
+    housingMeta = { decrypted: parsed.decrypted, warning: parsed.warning }
+  } else {
+    body = await readRequestBody(rawBody, contentType)
+  }
 
   const result = await processIncomingLead(sourceKey!, body)
   sendJson(res, 200, {
@@ -44,5 +59,6 @@ export async function handleWebhook(req: Req, res: Res, requestUrl?: string) {
     logId: result.logId,
     status: result.status,
     error: result.error,
+    ...housingMeta,
   })
 }

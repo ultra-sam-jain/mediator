@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { fetchLeads, retryLead } from '../lib/api'
 import { Filters } from '../components/Filters'
 import { LeadsTable } from '../components/LeadsTable'
+import { HousingPanel } from '../components/HousingPanel'
 import { SourceCards } from '../components/SourceCards'
 import { StatsBar } from '../components/StatsBar'
 import type { LeadLog } from '../../lib/types'
@@ -12,6 +13,7 @@ interface DashboardPageProps {
   showSourceFilter?: boolean
   showFailedActions?: boolean
   showWebhookUrls?: boolean
+  showHousingPanel?: boolean
 }
 
 export function DashboardPage({
@@ -20,6 +22,7 @@ export function DashboardPage({
   showSourceFilter = true,
   showFailedActions = false,
   showWebhookUrls = false,
+  showHousingPanel = false,
 }: DashboardPageProps) {
   const [rows, setRows] = useState<LeadLog[]>([])
   const [loading, setLoading] = useState(true)
@@ -59,6 +62,7 @@ export function DashboardPage({
     <div>
       <h2 className="text-lg font-semibold">{title}</h2>
       <StatsBar />
+      {showHousingPanel && <HousingPanel onSynced={load} />}
       {showWebhookUrls && <SourceCards />}
       <Filters
         search={search}

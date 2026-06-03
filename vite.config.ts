@@ -46,6 +46,16 @@ async function handleDevApi(
     await handleRetry(req, res)
     return true
   }
+  if (url.startsWith('/api/housing/status')) {
+    const { handleHousingStatus } = await server.ssrLoadModule('/lib/handlers/housing.ts')
+    await handleHousingStatus(req, res)
+    return true
+  }
+  if (url.startsWith('/api/housing/sync')) {
+    const { handleHousingSync } = await server.ssrLoadModule('/lib/handlers/housing.ts')
+    await handleHousingSync(req, res)
+    return true
+  }
 
   return false
 }
