@@ -1,15 +1,14 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { requireAdmin } from '../authService.js'
 import { getLeads } from '../dataService.js'
 import type { LeadStatus } from '../types.js'
-import { getQueryParam, sendJson, setCors } from '../apiUtils.js'
+import { getQueryParam, sendJson } from '../apiUtils.js'
 
 type Req = IncomingMessage | VercelRequest
 type Res = ServerResponse | VercelResponse
 
 export async function handleLeads(req: Req, res: Res, requestUrl?: string) {
-  setCors(res)
-
   if (req.method === 'OPTIONS') {
     res.statusCode = 204
     res.end()
@@ -20,6 +19,8 @@ export async function handleLeads(req: Req, res: Res, requestUrl?: string) {
     sendJson(res, 405, { error: 'Method not allowed' })
     return
   }
+
+  if (!requireAdmin(req, res)) return
 
   const url = requestUrl ?? ('url' in req ? req.url : undefined)
   const source = getQueryParam(url, 'source') ?? undefined

@@ -1,14 +1,13 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { requireAdmin } from '../authService.js'
 import { retryLead } from '../dataService.js'
-import { readRawBody, sendJson, setCors } from '../apiUtils.js'
+import { readRawBody, sendJson } from '../apiUtils.js'
 
 type Req = IncomingMessage | VercelRequest
 type Res = ServerResponse | VercelResponse
 
 export async function handleRetry(req: Req, res: Res) {
-  setCors(res)
-
   if (req.method === 'OPTIONS') {
     res.statusCode = 204
     res.end()
@@ -19,6 +18,8 @@ export async function handleRetry(req: Req, res: Res) {
     sendJson(res, 405, { error: 'Method not allowed' })
     return
   }
+
+  if (!requireAdmin(req, res)) return
 
   const raw = await readRawBody(req)
   let id = ''

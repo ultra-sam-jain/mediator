@@ -11,6 +11,21 @@ async function handleDevApi(
   const url = req.url ?? ''
   if (!url.startsWith('/api/')) return false
 
+  if (url.startsWith('/api/auth/login')) {
+    const { handleAuthLogin } = await server.ssrLoadModule('/lib/handlers/auth.ts')
+    await handleAuthLogin(req, res)
+    return true
+  }
+  if (url.startsWith('/api/auth/logout')) {
+    const { handleAuthLogout } = await server.ssrLoadModule('/lib/handlers/auth.ts')
+    await handleAuthLogout(req, res)
+    return true
+  }
+  if (url.startsWith('/api/auth/me')) {
+    const { handleAuthMe } = await server.ssrLoadModule('/lib/handlers/auth.ts')
+    await handleAuthMe(req, res)
+    return true
+  }
   if (url.startsWith('/api/webhook')) {
     const { handleWebhook } = await server.ssrLoadModule('/lib/handlers/webhook.ts')
     await handleWebhook(req, res, url)
