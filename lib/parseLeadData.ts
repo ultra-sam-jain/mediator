@@ -1,4 +1,4 @@
-import type { ParsedLead } from './types'
+import type { ParsedLead } from './types.js'
 
 function pickString(body: Record<string, unknown>, keys: string[]): string {
   for (const key of keys) {

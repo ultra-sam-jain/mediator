@@ -1,5 +1,5 @@
-import { getSupabaseAdmin } from './supabaseClient'
-import type { LeadFilters, LeadLog, LeadStats } from './types'
+import { getSupabaseAdmin } from './supabaseClient.js'
+import type { LeadFilters, LeadLog, LeadStats } from './types.js'
 
 interface LeadRow {
   id: string

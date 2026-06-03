@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto'
-import { forwardToDestination } from './forwardService'
-import { parseLeadData } from './parseLeadData'
-import { getSource } from './sources'
-import * as leadStore from './leadStore'
-import type { LeadFilters, LeadLog, LeadStats, ParsedLead } from './types'
+import { forwardToDestination } from './forwardService.js'
+import { parseLeadData } from './parseLeadData.js'
+import { getSource } from './sources.js'
+import * as leadStore from './leadStore.js'
+import type { LeadFilters, LeadLog, LeadStats, ParsedLead } from './types.js'
 
 export function createLogRow(
   source: string,

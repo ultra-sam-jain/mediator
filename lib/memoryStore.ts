@@ -1,4 +1,4 @@
-import type { LeadFilters, LeadLog, LeadStats } from './types'
+import type { LeadFilters, LeadLog, LeadStats } from './types.js'
 
 const logs: LeadLog[] = []
 

@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { retryLead } from '../dataService'
-import { readRawBody, sendJson, setCors } from '../apiUtils'
+import { retryLead } from '../dataService.js'
+import { readRawBody, sendJson, setCors } from '../apiUtils.js'
 
 type Req = IncomingMessage | VercelRequest
 type Res = ServerResponse | VercelResponse

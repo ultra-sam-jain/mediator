@@ -1,10 +1,10 @@
 /**
  * Data layer: Supabase (preferred) → Google Sheets GAS → in-memory fallback.
  */
-import { isSupabaseConfigured } from './supabaseClient'
-import * as sheetService from './sheetService'
-import * as supabaseService from './supabaseService'
-import type { LeadFilters, LeadLog, LeadStats } from './types'
+import { isSupabaseConfigured } from './supabaseClient.js'
+import * as sheetService from './sheetService.js'
+import * as supabaseService from './supabaseService.js'
+import type { LeadFilters, LeadLog, LeadStats } from './types.js'
 
 function store() {
   return isSupabaseConfigured() ? supabaseService : sheetService

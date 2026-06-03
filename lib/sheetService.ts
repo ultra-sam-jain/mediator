@@ -1,11 +1,11 @@
-import type { LeadFilters, LeadLog, LeadStats } from './types'
+import type { LeadFilters, LeadLog, LeadStats } from './types.js'
 import {
   memoryAppendLog,
   memoryGetLead,
   memoryGetStats,
   memoryListLeads,
   memoryUpdateStatus,
-} from './memoryStore'
+} from './memoryStore.js'
 
 const LOGS_GAS_URL = () => process.env.LOGS_GAS_URL?.trim() ?? ''
 
