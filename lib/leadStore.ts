@@ -33,3 +33,11 @@ export async function listLeads(filters: LeadFilters = {}) {
 export async function getStats(): Promise<LeadStats> {
   return store().getStats()
 }
+
+export async function checkLeadDuplicate(
+  source: string,
+  phone: string,
+  project: string,
+): Promise<boolean> {
+  return store().checkLeadDuplicate(source, phone, project)
+}

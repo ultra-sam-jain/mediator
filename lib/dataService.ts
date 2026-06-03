@@ -63,6 +63,14 @@ export async function processIncomingLead(
   rawPayload: Record<string, unknown>,
 ): Promise<{ logId: string; status: LeadLog['status']; error?: string }> {
   const parsed = parseLeadData(rawPayload)
+
+  if (parsed.phone && parsed.project) {
+    const isDuplicate = await leadStore.checkLeadDuplicate(sourceKey, parsed.phone, parsed.project)
+    if (isDuplicate) {
+      return { logId: '', status: 'SUCCESS', error: 'Duplicate lead skipped' }
+    }
+  }
+
   const row = await logLead(createLogRow(sourceKey, parsed, rawPayload))
 
   const forward = await forwardLead(sourceKey, rawPayload)

@@ -5,6 +5,7 @@ import {
   memoryGetStats,
   memoryListLeads,
   memoryUpdateStatus,
+  memoryCheckDuplicate,
 } from './memoryStore.js'
 
 const LOGS_GAS_URL = () => process.env.LOGS_GAS_URL?.trim() ?? ''
@@ -91,4 +92,12 @@ export async function getStats(): Promise<LeadStats> {
   } catch {
     return memoryGetStats()
   }
+}
+
+export async function checkLeadDuplicate(
+  source: string,
+  phone: string,
+  project: string,
+): Promise<boolean> {
+  return memoryCheckDuplicate(source, phone, project)
 }

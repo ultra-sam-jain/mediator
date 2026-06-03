@@ -69,3 +69,12 @@ export function memoryGetStats(): LeadStats {
     bySource,
   }
 }
+
+export function memoryCheckDuplicate(source: string, phone: string, project: string): boolean {
+  return logs.some(
+    (l) =>
+      l.source.toLowerCase() === source.toLowerCase() &&
+      l.phone === phone &&
+      l.project.toLowerCase() === project.toLowerCase(),
+  )
+}

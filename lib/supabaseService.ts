@@ -159,3 +159,21 @@ export async function getStats(): Promise<LeadStats> {
 
   return stats
 }
+
+export async function checkLeadDuplicate(
+  source: string,
+  phone: string,
+  project: string,
+): Promise<boolean> {
+  const supabase = getSupabaseAdmin()
+  const { data, error } = await supabase
+    .from('leads')
+    .select('id')
+    .eq('source', source)
+    .eq('phone', phone)
+    .eq('project', project)
+    .limit(1)
+
+  if (error) throw new Error(error.message)
+  return (data?.length ?? 0) > 0
+}
