@@ -1,0 +1,97 @@
+import { randomUUID } from 'crypto'
+import { forwardToDestination } from './forwardService'
+import { parseLeadData } from './parseLeadData'
+import { getSource } from './sources'
+import * as leadStore from './leadStore'
+import type { LeadFilters, LeadLog, LeadStats, ParsedLead } from './types'
+
+export function createLogRow(
+  source: string,
+  parsed: ParsedLead,
+  rawPayload: Record<string, unknown>,
+): LeadLog {
+  return {
+    id: randomUUID(),
+    timestamp: new Date().toISOString(),
+    source,
+    status: 'PENDING',
+    raw_payload: JSON.stringify(rawPayload),
+    ...parsed,
+  }
+}
+
+export async function logLead(row: LeadLog): Promise<LeadLog> {
+  return leadStore.appendLogRow(row)
+}
+
+export async function updateLeadStatus(
+  id: string,
+  status: LeadLog['status'],
+  forwardError?: string,
+): Promise<void> {
+  await leadStore.updateLogStatus(id, status, forwardError)
+}
+
+export async function forwardLead(
+  sourceKey: string,
+  rawPayload: Record<string, unknown>,
+): Promise<{ ok: boolean; error?: string }> {
+  const source = getSource(sourceKey)
+  if (!source?.destinationUrl) {
+    return { ok: false, error: `No destination URL configured for source "${sourceKey}"` }
+  }
+
+  const result = await forwardToDestination(source.destinationUrl, rawPayload)
+  return result.ok ? { ok: true } : { ok: false, error: result.error ?? result.body }
+}
+
+export async function processIncomingLead(
+  sourceKey: string,
+  rawPayload: Record<string, unknown>,
+): Promise<{ logId: string; status: LeadLog['status']; error?: string }> {
+  const parsed = parseLeadData(rawPayload)
+  const row = await logLead(createLogRow(sourceKey, parsed, rawPayload))
+
+  const forward = await forwardLead(sourceKey, rawPayload)
+  if (forward.ok) {
+    await updateLeadStatus(row.id, 'SUCCESS')
+    return { logId: row.id, status: 'SUCCESS' }
+  }
+
+  await updateLeadStatus(row.id, 'FAILED', forward.error)
+  return { logId: row.id, status: 'FAILED', error: forward.error }
+}
+
+export async function retryLead(id: string): Promise<{
+  ok: boolean
+  status: LeadLog['status']
+  error?: string
+}> {
+  const row = await leadStore.getLeadById(id)
+  if (!row) return { ok: false, status: 'FAILED', error: 'Lead not found' }
+
+  let rawPayload: Record<string, unknown>
+  try {
+    rawPayload = JSON.parse(row.raw_payload) as Record<string, unknown>
+  } catch {
+    return { ok: false, status: 'FAILED', error: 'Invalid stored payload' }
+  }
+
+  await updateLeadStatus(id, 'PENDING')
+  const forward = await forwardLead(row.source, rawPayload)
+  if (forward.ok) {
+    await updateLeadStatus(id, 'SUCCESS')
+    return { ok: true, status: 'SUCCESS' }
+  }
+
+  await updateLeadStatus(id, 'FAILED', forward.error)
+  return { ok: false, status: 'FAILED', error: forward.error }
+}
+
+export async function getLeads(filters: LeadFilters) {
+  return leadStore.listLeads(filters)
+}
+
+export async function getStats(): Promise<LeadStats> {
+  return leadStore.getStats()
+}
