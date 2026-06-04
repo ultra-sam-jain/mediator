@@ -13,7 +13,7 @@ export interface HousingParseResult {
 }
 
 function flattenHousingLead(body: Record<string, unknown>): Record<string, unknown> {
-  for (const key of ['lead', 'Lead', 'lead_data', 'customer', 'Customer']) {
+  for (const key of ['lead', 'Lead', 'lead_data', 'customer', 'Customer', 'data', 'Data', 'payload', 'response', 'Response']) {
     const nested = body[key]
     if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
       return { ...body, ...(nested as Record<string, unknown>) }

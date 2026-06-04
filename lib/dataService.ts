@@ -17,7 +17,9 @@ export function createLogRow(
     'date', 'Date',
     'time', 'Time',
     'dateTime', 'DateTime',
-    'timestamp', 'Timestamp'
+    'timestamp', 'Timestamp',
+    'lead_date', 'leadDate',
+    'contacted_at', 'Contacted_At'
   ]
   for (const key of timeKeys) {
     const val = rawPayload[key]
