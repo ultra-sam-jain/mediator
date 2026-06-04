@@ -10,9 +10,46 @@ export function createLogRow(
   parsed: ParsedLead,
   rawPayload: Record<string, unknown>,
 ): LeadLog {
+  let timestamp = new Date().toISOString()
+  const timeKeys = [
+    'lead_time', 'leadTime', 'Lead_Time', 'LeadTime',
+    'created_at', 'createdAt',
+    'date', 'Date',
+    'time', 'Time',
+    'dateTime', 'DateTime',
+    'timestamp', 'Timestamp'
+  ]
+  for (const key of timeKeys) {
+    const val = rawPayload[key]
+    if (val) {
+      if (typeof val === 'number') {
+        const dateObj = new Date(val > 9999999999 ? val : val * 1000)
+        if (!isNaN(dateObj.getTime())) {
+          timestamp = dateObj.toISOString()
+          break
+        }
+      } else if (typeof val === 'string' && val.trim() !== '') {
+        const num = Number(val)
+        if (!isNaN(num) && val.trim() !== '' && num > 0) {
+          const dateObj = new Date(num > 9999999999 ? num : num * 1000)
+          if (!isNaN(dateObj.getTime())) {
+            timestamp = dateObj.toISOString()
+            break
+          }
+        } else {
+          const dateObj = new Date(val)
+          if (!isNaN(dateObj.getTime())) {
+            timestamp = dateObj.toISOString()
+            break
+          }
+        }
+      }
+    }
+  }
+
   return {
     id: randomUUID(),
-    timestamp: new Date().toISOString(),
+    timestamp,
     source,
     status: 'PENDING',
     raw_payload: JSON.stringify(rawPayload),

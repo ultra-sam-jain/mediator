@@ -13,14 +13,25 @@ const samplePayload = {
 
 export function TestLeadPage() {
   const [source, setSource] = useState('housing')
+  const [payloadText, setPayloadText] = useState(JSON.stringify(samplePayload, null, 2))
   const [result, setResult] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [jsonError, setJsonError] = useState<string | null>(null)
 
   async function submit() {
+    let parsed: Record<string, string>
+    try {
+      parsed = JSON.parse(payloadText)
+      setJsonError(null)
+    } catch (e) {
+      setJsonError(e instanceof Error ? e.message : 'Invalid JSON')
+      return
+    }
+
     setLoading(true)
     setResult(null)
     try {
-      const res = await sendTestLead(source, samplePayload)
+      const res = await sendTestLead(source, parsed)
       setResult(
         res.error
           ? `Logged ${res.logId} — forward FAILED: ${res.error}`
@@ -54,15 +65,38 @@ export function TestLeadPage() {
         <button
           type="button"
           onClick={submit}
-          disabled={loading}
+          disabled={loading || !!jsonError}
           className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500 disabled:opacity-50"
         >
           {loading ? 'Sending…' : 'Send test lead'}
         </button>
       </div>
-      <pre className="mt-4 overflow-x-auto rounded-xl border border-slate-800 bg-slate-950 p-4 text-xs text-slate-400">
-        {JSON.stringify(samplePayload, null, 2)}
-      </pre>
+      <div className="mt-4">
+        <label className="block text-xs font-medium text-slate-400 mb-1">
+          JSON Payload (Edit as needed):
+        </label>
+        <textarea
+          value={payloadText}
+          onChange={(e) => {
+            setPayloadText(e.target.value)
+            try {
+              JSON.parse(e.target.value)
+              setJsonError(null)
+            } catch (err) {
+              setJsonError(err instanceof Error ? err.message : 'Invalid JSON')
+            }
+          }}
+          rows={10}
+          className={`w-full font-mono text-xs rounded-xl border p-4 bg-slate-950 text-slate-300 focus:outline-none focus:ring-2 ${
+            jsonError ? 'border-red-500/80 focus:ring-red-500/30' : 'border-slate-800 focus:ring-emerald-500/30'
+          }`}
+        />
+        {jsonError && (
+          <p className="mt-1 text-xs text-red-400">
+            {jsonError}
+          </p>
+        )}
+      </div>
       {result && (
         <p className="mt-4 rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-sm">
           {result}
