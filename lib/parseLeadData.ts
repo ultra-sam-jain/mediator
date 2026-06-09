@@ -13,15 +13,16 @@ function pickString(body: Record<string, unknown>, keys: string[]): string {
 export function parseLeadData(body: Record<string, unknown>): ParsedLead {
   return {
     name: pickString(body, [
+      'lead_name',
       'Name',
       'name',
-      'lead_name',
       'customer_name',
       'Customer_Name',
       'buyer_name',
       'Buyer_Name',
     ]),
     phone: pickString(body, [
+      'mobile_no',
       'Mobile_Number',
       'mobile',
       'phone',
